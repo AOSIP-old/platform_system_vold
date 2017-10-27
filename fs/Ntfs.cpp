@@ -65,12 +65,19 @@ status_t Mount(const std::string& source, const std::string& target, bool ro,
             "shortname=mixed,nodev,nosuid,dirsync",
             ownerUid, ownerGid, permMask, permMask);
 
-    if (!executable)
-        strcat(mountData, ",noexec");
-    if (ro)
-        strcat(mountData, ",ro");
-    if (remount)
-        strcat(mountData, ",remount");
+    int mdlen = sizeof(mountData);
+    if (!executable) {
+        if (strlcat(mountData, ",noexec", mdlen) >= (unsigned)mdlen)
+            abort();
+    }
+    if (ro) {
+        if (strlcat(mountData, ",ro", mdlen) >= (unsigned)mdlen)
+            abort();
+    }
+    if (remount) {
+        if (strlcat(mountData, ",remount", mdlen) >= (unsigned)mdlen)
+            abort();
+    }
 
     std::vector<std::string> cmd;
     cmd.push_back(kMountPath);
